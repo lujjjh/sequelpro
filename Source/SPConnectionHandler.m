@@ -124,6 +124,8 @@ static NSString *SPLocalhostAddress = @"127.0.0.1";
 		}
 	}
 	
+	if ([self database]) [mySQLConnection setDatabase:[self database]];
+	
 	// Only set the password if there is no Keychain item set and the connection is not being tested.
 	// The connection will otherwise ask the delegate for passwords in the Keychain.	
 	if ((!connectionKeychainItemName || isTestingConnection) && [self password]) {

@@ -42,7 +42,6 @@ static void *mySQLThreadFlag;
 
 // The default connection options for MySQL connections
 const SPMySQLClientFlags SPMySQLConnectionOptions =
-					SPMySQLClientFlagCompression |  // Enable protocol compression - almost always a win
 					SPMySQLClientFlagInteractive |  // Mark ourselves as an interactive client
 					SPMySQLClientFlagMultiResults;  // Multiple result support (very basic, but present)
 
@@ -59,6 +58,7 @@ const char *SPMySQLSSLPermissibleCiphers = "DHE-RSA-AES256-SHA:AES256-SHA:DHE-RS
 @synthesize username;
 @synthesize password;
 @synthesize port;
+@synthesize database;
 @synthesize useSocket;
 @synthesize socketPath;
 @synthesize useSSL;
@@ -613,6 +613,7 @@ static uint64_t _elapsedMicroSecondsSinceAbsoluteTime(uint64_t comparisonTime)
 	const char *theHost = NULL;
 	const char *theUsername = "";
 	const char *thePassword = NULL;
+	const char *theDatabase = NULL;
 	const char *theSocket = NULL;
 
 	if (host) theHost = [host UTF8String]; //mysql calls getaddrinfo on the hostname. Apples code uses -UTF8String in that situation.
@@ -633,6 +634,8 @@ static uint64_t _elapsedMicroSecondsSinceAbsoluteTime(uint64_t comparisonTime)
 	} else if ([delegate respondsToSelector:@selector(keychainPasswordForConnection:)]) {
 		thePassword = _cStringForStringWithEncoding([delegate keychainPasswordForConnection:self], connectEncodingNS, NULL);
 	}
+    
+ 	if (database) theDatabase = _cStringForStringWithEncoding(database, connectEncodingNS, NULL);
 
 	// If set to use a socket and a socket was supplied, use it; otherwise, search for a socket to use
 	if (useSocket) {
@@ -690,7 +693,7 @@ static uint64_t _elapsedMicroSecondsSinceAbsoluteTime(uint64_t comparisonTime)
 		}
 	}
 
-	MYSQL *connectionStatus = mysql_real_connect(theConnection, theHost, theUsername, thePassword, NULL, (unsigned int)port, theSocket, [self clientFlags]);
+	MYSQL *connectionStatus = mysql_real_connect(theConnection, theHost, theUsername, thePassword, theDatabase, (unsigned int)port, theSocket, [self clientFlags]);
 
 	// If the connection failed, return NULL
 	if (theConnection != connectionStatus) {

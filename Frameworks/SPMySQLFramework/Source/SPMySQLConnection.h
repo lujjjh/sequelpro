@@ -139,6 +139,7 @@
 @property (readwrite, retain) NSString *username;
 @property (readwrite, retain) NSString *password;
 @property (readwrite, assign) NSUInteger port;
+@property (readwrite, retain) NSString *database;
 @property (readwrite, assign) BOOL useSocket;
 @property (readwrite, retain) NSString *socketPath;
 
